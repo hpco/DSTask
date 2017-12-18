@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="4dp"
     android:layout_margin="5dp">
+
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -35,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="15120" />
+
     <TextView
         android:id="@+id/rating"
         android:layout_width="match_parent"
@@ -43,8 +45,18 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/distance"/>
-
-
+        android:id="@+id/distance" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/storeid" />
+    <ImageView
+        android:id="@+id/fav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        card_view:srcCompat="@android:drawable/btn_star" />
 </LinearLayout>
-    </android.support.v7.widget.CardView>
+
+
+
+</android.support.v7.widget.CardView>

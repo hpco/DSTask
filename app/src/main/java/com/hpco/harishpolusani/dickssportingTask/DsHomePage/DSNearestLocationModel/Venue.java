@@ -176,6 +176,6 @@ public class Venue implements  Comparable<Venue> {
 
     @Override
     public int compareTo(@NonNull Venue venue) {
-      return this.getLocation().getCity().compareTo(venue.getLocation().getCity());
+      return this.getStoreId().compareTo(venue.getStoreId());
     }
 }

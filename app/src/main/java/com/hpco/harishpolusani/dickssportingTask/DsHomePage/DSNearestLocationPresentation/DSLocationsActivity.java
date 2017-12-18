@@ -1,6 +1,8 @@
 package com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationPresentation;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -54,17 +56,23 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     private static final long MIN_TIME_BW_UPDATES = 6000;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     android.location.Location location = null;
+    private  SharedPreferences mPrefs;
+    private static  final String FAV_OPTION="favoption";
+    private static final String STORE_ID="storeid";
+    private List<Venue> mlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dsnearest_locations);
         ButterKnife.bind(this);
+        mPrefs = this.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mPresenter = new DsLocationPresenter(this);
         mPresenter.fetchDSApi();
         showLoadingIndicator();
+
     }
 
     @Override
@@ -118,11 +126,11 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void dsApiFailure() {
         hideLoadingIndicator();
-        updateAdapter(sortTheStoreByDistance(loadDummyData()));
+        updateAdapter(sortTheStoresByDistance(loadDummyData()));
         Log.d("Api failure", "");
     }
 
-    private List<Map.Entry<Venue, Float>> sortTheStoreByDistance(List<Venue> list) {
+    private List<Map.Entry<Venue, Float>> sortTheStoresByDistance(List<Venue> list) {
         SortedMap<Venue, Float> distanceMap = new TreeMap<>();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -143,13 +151,17 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
                         }
                     });
             android.location.Location locationEnd = new android.location.Location("");
+            String storeID=mPrefs.getString(STORE_ID,null);
             Venue venue;
             for (int i = 0; i < list.size(); i++) {
                 venue = list.get(i);
                 locationEnd.setLatitude(venue.getLocation().getLatitude());
                 locationEnd.setLatitude(venue.getLocation().getLongitude());
-               Float value= location.distanceTo(locationEnd);
-                distanceMap.put(list.get(i), location.distanceTo(locationEnd));
+                if(storeID!=null&&venue.getStoreId().equalsIgnoreCase(storeID)){
+                    distanceMap.put(venue,0.0f);
+                }else {
+                    distanceMap.put(venue, location.distanceTo(locationEnd));
+                }
             }
             sortedset.addAll(distanceMap.entrySet());
             return new ArrayList<>(sortedset);
@@ -245,37 +257,65 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         Venue venue=new Venue();
         Location location= new Location();
         venue.setRating(10.00);
+        venue.setStoreId("0");
         venue.setName("Dicks Store");
         location.setCity("Pitsburg");
         location.setLatitude(40.440625);
         location.setLongitude(-79.995886);
+        Venue venue1=new Venue();
         venue.setLocation(location);
         list.add(venue);
-        venue.setRating(10.00);
-        venue.setName("Dicks Store");
-        venue.getLocation().setCity("philadelphia");
-        venue.getLocation().setLatitude(39.952584);
-        venue.getLocation().setLongitude(-75.165222);
-        list.add(venue);
-        venue.setRating(10.00);
-        venue.setName("Dicks Store");
-        venue.getLocation().setCity("Allentown");
-        venue.getLocation().setLatitude(40.608430);
-        venue.getLocation().setLongitude(-75.490183);
-        list.add(venue);
-        venue.setRating(10.00);
-        venue.setName("Dicks Store");
-        venue.getLocation().setCity("Allentown");
-        venue.getLocation().setLatitude(40.608430);
-        venue.getLocation().setLongitude(-75.490183);
-        list.add(venue);
-        venue.setRating(10.00);
-        venue.setName("Dicks Store");
-        venue.getLocation().setCity("CoopersBurg");
-        venue.getLocation().setLatitude(40.511488);
-        venue.getLocation().setLongitude(-75.390458);
-        list.add(venue);
+        venue1.setRating(10.00);
+        venue1.setStoreId("1");
+        venue1.setName("Dicks Store2");
+        Location location1= new Location();
+        location1.setCity("philadelphia");
+        location1.setLatitude(39.952584);
+        location1.setLongitude(-75.165222);
+        venue1.setLocation(location1);
 
+        list.add(venue1);
+        Venue venue2=new Venue();
+        venue2.setRating(10.00);
+        venue2.setStoreId("4");
+        venue2.setName("Dicks Store3");
+
+        Location location2= new Location();
+        location2.setCity("Allentown");
+        location2.setLatitude(40.608430);
+        location2.setLongitude(-75.490183);
+        venue2.setLocation(location2);
+//        venue2.getLocation().setCity("Allentown");
+//        venue2.getLocation().setLatitude(40.608430);
+//        venue2.getLocation().setLongitude(-75.490183);
+        list.add(venue2);
+        Venue venue3=new Venue();
+        venue3.setRating(10.00);
+        venue3.setName("Dicks Store4");
+        venue3.setStoreId("2");
+        Location location3= new Location();
+        location3.setCity("Allentown");
+        location3.setLatitude(40.608430);
+        location3.setLongitude(-75.490183);
+        venue3.setLocation(location3);
+//        venue3.getLocation().setCity("Allentown");
+//        venue3.getLocation().setLatitude(40.608430);
+//        venue3.getLocation().setLongitude(-75.490183);
+        list.add(venue3);
+        Venue venue4=new Venue();
+        venue4.setRating(10.00);
+        venue4.setName("Dicks Store5");
+        venue4.setStoreId("3");
+        Location location4= new Location();
+        location4.setCity("CoopersBurg");
+        location4.setLatitude(40.511488);
+        location4.setLongitude(-75.390458);
+        venue4.setLocation(location4);
+//        venue4.getLocation().setCity("CoopersBurg");
+//        venue4.getLocation().setLatitude(40.511488);
+//        venue4.getLocation().setLongitude(-75.390458);
+        list.add(venue4);
+        mlist=list;
         return list;
     }
 
@@ -309,6 +349,13 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void onclick(View view, int position) {
 
+    }
+
+    @Override
+    public void refreshData(String id){
+        mPrefs.edit().putString(STORE_ID,id).apply();
+        dsAdapter.updateData(sortTheStoresByDistance(mlist));
+        dsAdapter.notifyDataSetChanged();
     }
 
     @Override

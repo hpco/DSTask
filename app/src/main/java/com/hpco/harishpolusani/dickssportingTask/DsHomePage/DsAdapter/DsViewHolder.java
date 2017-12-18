@@ -2,6 +2,7 @@ package com.hpco.harishpolusani.dickssportingTask.DsHomePage.DsAdapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,8 +22,6 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @BindView(R.id.name)
     TextView mName;
 
-    @BindView(R.id.distance)
-    TextView mDistance;
     @BindView(R.id.city)
     TextView mCity;
 
@@ -32,6 +31,14 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @BindView(R.id.rating)
     TextView mRating;
 
+    @BindView(R.id.distance)
+    TextView mDistance;
+    @BindView(R.id.fav_view)
+    ImageView favView;
+
+    @BindView(R.id.storeid)
+    TextView mStoreId;
+
     private DsStoresAdapter.OnItemClickListner listner;
 
     public DsViewHolder(View itemView, DsStoresAdapter.OnItemClickListner listner) {
@@ -40,14 +47,22 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         itemView.setOnClickListener(this);
         ButterKnife.bind(this, itemView);
         getAdapterPosition();
+       favView.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View view) {
-        int pos= getAdapterPosition();
-        if (pos != RecyclerView.NO_POSITION){
-            listner.onclick(view,pos);
+        if(view.getId()==favView.getId()){
+//            int pos = getAdapterPosition();
+//            if (pos != RecyclerView.NO_POSITION) {
+                listner.refreshData(mStoreId.getText().toString());
+//            }
+        }else {
+            int pos = getAdapterPosition();
+            if (pos != RecyclerView.NO_POSITION) {
+                listner.onclick(view, pos);
+            }
         }
     }
 }

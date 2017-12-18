@@ -1,6 +1,8 @@
 package com.hpco.harishpolusani.dickssportingTask.DsHomePage.DsAdapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +23,19 @@ public class DsStoresAdapter extends RecyclerView.Adapter<DsViewHolder> {
 private Context context;
     private List<Map.Entry<Venue, Float>> mVenuesList;
     private OnItemClickListner mListner;
+    private int position;
+    private static  final String FAV_OPTION="favoption";
+    private static final String STORE_ID="storeid";
+    private SharedPreferences mPrefs;
+    private String id;
+    private boolean intialSetup;
+
     public DsStoresAdapter(Context context, List<Map.Entry<Venue, Float>> venueList, OnItemClickListner listner){
       this.context=context;
         mVenuesList=venueList;
         mListner=listner;
+        mPrefs = context.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
+        id=mPrefs.getString(STORE_ID,null);
     }
     @Override
     public DsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,13 +46,16 @@ private Context context;
 
     @Override
     public void onBindViewHolder(DsViewHolder holder, int position) {
+
      if(mVenuesList.get(position)!=null&&mVenuesList.get(position).getKey()!=null){
      holder.mName.setText(mVenuesList.get(position).getKey().getName());
          holder.mRating.setText("Store Rating : " +String.valueOf(mVenuesList.get(position).getKey().getRating()));
+         holder.mStoreId.setText("Store ID :"+mVenuesList.get(position).getKey().getStoreId());
          if(mVenuesList.get(position).getKey().getLocation()!=null) {
              holder.mCity.setText("City : "+mVenuesList.get(position).getKey().getLocation().getCity());
              holder.mZipcode.setText("Zipcode "+mVenuesList.get(position).getKey().getLocation().getPostalCode());
              holder.mDistance.setText("Distance From Current Location: "+String.valueOf(mVenuesList.get(position).getValue()));
+
          }
      }
     }
@@ -61,5 +75,6 @@ private Context context;
     }
     public interface  OnItemClickListner{
         void onclick(View view,int position);
+        void refreshData(String storeID);
     }
 }
