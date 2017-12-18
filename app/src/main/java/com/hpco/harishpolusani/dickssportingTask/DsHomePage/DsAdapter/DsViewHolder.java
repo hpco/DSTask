@@ -39,9 +39,9 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 
 
     private String storeId;
-    private DsStoresAdapter.OnItemClickListner listner;
+    private OnItemClickListner listner;
 
-    public DsViewHolder(View itemView, DsStoresAdapter.OnItemClickListner listner) {
+    public DsViewHolder(View itemView, OnItemClickListner listner) {
         super(itemView);
         this.listner=listner;
         itemView.setOnClickListener(this);
@@ -63,7 +63,7 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
         }else {
             int pos = getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
-                listner.onclick(view, pos);
+                listner.onclick(view, pos,null);
             }
         }
     }

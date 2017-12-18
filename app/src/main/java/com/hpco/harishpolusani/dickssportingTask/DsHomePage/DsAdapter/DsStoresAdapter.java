@@ -13,13 +13,13 @@ import com.hpco.harishpolusani.dickssportingTask.R;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+
 
 /**
  * Created by harishpolusani on 12/16/17.
  */
 
-public class DsStoresAdapter extends RecyclerView.Adapter<DsViewHolder> {
+public class DsStoresAdapter extends RecyclerView.Adapter<DsViewHolder> implements OnItemClickListner {
 private Context context;
     private List<Map.Entry<Venue, Float>> mVenuesList;
     private OnItemClickListner mListner;
@@ -41,7 +41,7 @@ private Context context;
     public DsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
 
-        return new DsViewHolder(LayoutInflater.from(context).inflate(R.layout.single_item_view,parent,false),mListner);
+        return new DsViewHolder(LayoutInflater.from(context).inflate(R.layout.single_item_view,parent,false),this);
     }
 
     @Override
@@ -71,8 +71,16 @@ private Context context;
         }
 
     }
-    public interface  OnItemClickListner{
-        void onclick(View view,int position);
-        void refreshData(String storeID);
+
+    @Override
+    public void onclick(View view, int position,Venue venue) {
+        mListner.onclick(view, position,mVenuesList.get(position).getKey());
     }
+
+    @Override
+    public void refreshData(String storeID) {
+        mListner.refreshData(storeID);
+    }
+
+
 }

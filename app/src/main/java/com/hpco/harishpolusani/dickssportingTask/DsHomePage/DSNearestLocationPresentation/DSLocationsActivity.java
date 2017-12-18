@@ -2,12 +2,15 @@ package com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationPr
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -27,10 +30,12 @@ import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationMod
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel.Location;
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel.Venue;
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DsAdapter.DsStoresAdapter;
+import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DsAdapter.OnItemClickListner;
 import com.hpco.harishpolusani.dickssportingTask.R;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -41,12 +46,13 @@ import java.util.TreeSet;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DSLocationsActivity extends AppCompatActivity implements DsLocationsContract.LocationView, DsStoresAdapter.OnItemClickListner, LocationListener {
+public class DSLocationsActivity extends AppCompatActivity implements DsLocationsContract.LocationView,OnItemClickListner, LocationListener {
 
     private DsLocationsContract.LocationPresenter mPresenter;
     @BindView(R.id.nearby_rview)
     RecyclerView recyclerView;
-
+@BindView(R.id.container_layout)
+    ConstraintLayout constraintLayoutcontainer;
     @BindView(R.id.api_loading)
     ProgressBar mProgressBar;
     private LocationManager locationManager;
@@ -59,7 +65,9 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     private  SharedPreferences mPrefs;
     private static  final String FAV_OPTION="favoption";
     private static final String STORE_ID="storeid";
-    private List<Map.Entry<Venue,Float>> mlist;
+    private List<Venue> mlist;
+    private  FragmentTransaction ft;
+    private static final String fragmentTag="DSinnerfragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +134,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void dsApiFailure() {
         hideLoadingIndicator();
-        mlist=sortTheStoresByDistance(loadDummyData());
-        updateAdapter(mlist);
+        updateAdapter(sortTheStoresByDistance(loadDummyData()));
         Log.d("Api failure", "");
     }
 
@@ -159,13 +166,14 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
                 locationEnd.setLatitude(venue.getLocation().getLatitude());
                 locationEnd.setLatitude(venue.getLocation().getLongitude());
                 if(storeID!=null&&venue.getStoreId().equals(storeID)){
+
                     distanceMap.put(venue,0.0f);
                 }else {
                     distanceMap.put(venue, location.distanceTo(locationEnd));
                 }
             }
             sortedset.addAll(distanceMap.entrySet());
-            return new ArrayList<>(sortedset);
+            return new LinkedList<>(sortedset);
         }
         return null;
     }
@@ -225,18 +233,6 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-//                        try {
-//                            locationManager.requestLocationUpdates(
-//                                    LocationManager.NETWORK_PROVIDER,
-//                                    MIN_TIME_BW_UPDATES,
-//                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-//                            if (locationManager != null) {
-//                                location = locationManager
-//                                        .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//                            }
-//                        }catch(Exception e){
-//                            e.printStackTrace();
-//                        }
                          location = getCurrentLocation();
                     }
 
@@ -295,6 +291,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         location4.setLongitude(-75.390458);
         venue4.setLocation(location4);
         list.add(venue4);
+        mlist=list;
         return list;
     }
 
@@ -326,26 +323,24 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
 
 
     @Override
-    public void onclick(View view, int position) {
-
+    public void onclick(View view, int position,Venue venue) {
+        recyclerView.setVisibility(View.GONE);
+        Fragment newFragment = new DsLocationInnerFragment(venue);
+        ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.container_layout, newFragment,fragmentTag);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
     public void refreshData(String id){
         mPrefs.edit().putString(STORE_ID,id).apply();
-        dsAdapter.notifyItemMoved(calculateToandFromPosition(id),0);
+        dsAdapter.updateData(sortTheStoresByDistance(mlist));
+        dsAdapter.notifyDataSetChanged();
+//        dsAdapter.notifyItemMoved(calculateToandFromPosition(id),0);
     }
 
-    private int calculateToandFromPosition(String id) {
-        if(mlist!=null) {
-            for (int i = 0; i < mlist.size(); i++) {
-                if (id.equalsIgnoreCase(mlist.get(i).getKey().getStoreId())) {
-                    return i;
-                }
-            }
-        }
-        return 0;
-    }
+
 
     @Override
     public void onLocationChanged(android.location.Location location) {
@@ -364,6 +359,13 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
 
     @Override
     public void onProviderDisabled(String s) {
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
+        recyclerView.setVisibility(View.VISIBLE);
 
     }
 }
