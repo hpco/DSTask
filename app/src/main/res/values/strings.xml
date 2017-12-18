@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DicksSportingTask</string>
+    <string name="action_settings">Settings</string>
+    <string name="ds_api">dsglabs/mobile/api</string>
+</resources>
