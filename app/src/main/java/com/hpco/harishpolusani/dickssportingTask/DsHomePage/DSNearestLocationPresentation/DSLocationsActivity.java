@@ -306,6 +306,11 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         super.onDestroy();
         if(mPresenter!=null){
             mPresenter.unSubscribe();
+            CommonUtils.mlist=null;
+            dsAdapter=null;
+            recyclerView=null;
+            locationManager=null;
+            ft=null;
         }
     }
 
