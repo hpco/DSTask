@@ -7,4 +7,7 @@
 5) facebook and twiltter integration can be added .
 6) used dummy data to create the app as the api was down from last week , today it was up .
 7) dagger can be implemented for  reducing th edependecy and easy for testing . I would change the architecute to support dagger if i would have time .
+8)forgot to add the cleanUp in onDestroy().
+9)Orientation change  can be hadled differently at present when the user rotate the device it will launch the activity by removing the fragment if the user was in the fragment while rotation. this can be changed to remain on the same UI even after rotation . specific steps were not mentioned for orientation changes in the requirement.
+
 
