@@ -48,12 +48,16 @@ private Context context;
     public void onBindViewHolder(DsViewHolder holder, int position) {
 
      if(mVenuesList.get(position)!=null&&mVenuesList.get(position).getKey()!=null){
+         if(position==0){
+             holder.favView.setImageDrawable(context.getResources().getDrawable(R.drawable.selected_icon));
+         }
      holder.mName.setText(mVenuesList.get(position).getKey().getName());
-         holder.mRating.setText("Store Rating : " +String.valueOf(mVenuesList.get(position).getKey().getRating()));
+         holder.mRating.setText(context.getResources().getString(R.string.placeholdertextrating) +String.valueOf(mVenuesList.get(position).getKey().getRating()));
+
          holder.setStoreId(mVenuesList.get(position).getKey().getStoreId());
          if(mVenuesList.get(position).getKey().getLocation()!=null) {
-             holder.mCity.setText("City : "+mVenuesList.get(position).getKey().getLocation().getCity());
-             holder.mZipcode.setText("Zipcode "+mVenuesList.get(position).getKey().getLocation().getPostalCode());
+             holder.mCity.setText(context.getResources().getString(R.string.placeholdertextcity)+mVenuesList.get(position).getKey().getLocation().getCity());
+             holder.mZipcode.setText(context.getResources().getString(R.string.placeholdetextzipcode)+mVenuesList.get(position).getKey().getLocation().getPostalCode());
          }
      }
     }
@@ -79,6 +83,7 @@ private Context context;
 
     @Override
     public void refreshData(String storeID) {
+
         mListner.refreshData(storeID);
     }
 

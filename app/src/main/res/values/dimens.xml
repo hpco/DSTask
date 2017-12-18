@@ -1,3 +1,9 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="margin_left">5dp</dimen>
+    <dimen name="margin_top">10dp</dimen>
+    <dimen name="corner_radius">4dp</dimen>
+   // thisvalues need to be adjusted according the size of the device .
+    <dimen name="imageviewheight">200dp</dimen>
+    <dimen name="imageviewWidth">400dp</dimen>
 </resources>

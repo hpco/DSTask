@@ -59,6 +59,7 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
 //            int pos = getAdapterPosition();
 //            if (pos != RecyclerView.NO_POSITION) {
                 listner.refreshData(storeId);
+            favView.setActivated(true);
 //            }
         }else {
             int pos = getAdapterPosition();

@@ -5,17 +5,17 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="4dp"
-    android:layout_margin="5dp">
+    card_view:cardCornerRadius="@dimen/corner_radius"
+    android:layout_margin="@dimen/margin_left">
 
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginBottom="10dp"
+    android:layout_marginTop="@dimen/margin_top"
+    android:layout_marginLeft="@dimen/margin_top"
+    android:layout_marginStart="@dimen/margin_top"
+    android:layout_marginBottom="@dimen/margin_top"
     android:id="@+id/single_item_holder">
 
     <!--android:background="@color/railsItem_bg_color"-->
@@ -23,29 +23,30 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DickSSporting" />
+        android:text="@string/name" />
 
     <TextView
         android:id="@+id/city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pitsburg" />
+        android:text="@string/city" />
+
 
     <TextView
         android:id="@+id/zipcode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="15120" />
+        android:text="@string/pincode" />
 
     <TextView
         android:id="@+id/rating"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0" />
+        android:text="@string/rating" />
     <ImageView
         android:id="@+id/fav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         card_view:srcCompat="@android:drawable/btn_star" />
 </LinearLayout>
 

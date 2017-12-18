@@ -1,12 +1,15 @@
 package com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Venue implements  Comparable<Venue> {
+public class Venue implements  Comparable<Venue>, Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -176,6 +179,98 @@ public class Venue implements  Comparable<Venue> {
 
     @Override
     public int compareTo(@NonNull Venue venue) {
-      return this.getStoreId().compareTo(venue.getStoreId());
+        return this.getStoreId().compareTo(venue.getStoreId());
     }
+    public Venue(){
+
+     }
+    protected Venue(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        byte verifiedVal = in.readByte();
+        verified = verifiedVal == 0x02 ? null : verifiedVal != 0x00;
+        url = in.readString();
+        ratingColor = in.readString();
+        ratingSignals = in.readByte() == 0x00 ? null : in.readInt();
+        rating = in.readByte() == 0x00 ? null : in.readDouble();
+        storeId = in.readString();
+        location = (Location) in.readValue(Location.class.getClassLoader());
+        if (in.readByte() == 0x01) {
+            contacts = new ArrayList<Contact>();
+            in.readList(contacts, Contact.class.getClassLoader());
+        } else {
+            contacts = null;
+        }
+        if (in.readByte() == 0x01) {
+            photos = new ArrayList<Photo>();
+            in.readList(photos, Photo.class.getClassLoader());
+        } else {
+            photos = null;
+        }
+        canonicalUrl = in.readString();
+        description = in.readString();
+        shortUrl = in.readString();
+        timeZone = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        if (verified == null) {
+            dest.writeByte((byte) (0x02));
+        } else {
+            dest.writeByte((byte) (verified ? 0x01 : 0x00));
+        }
+        dest.writeString(url);
+        dest.writeString(ratingColor);
+        if (ratingSignals == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeInt(ratingSignals);
+        }
+        if (rating == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(rating);
+        }
+        dest.writeString(storeId);
+        dest.writeValue(location);
+        if (contacts == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(contacts);
+        }
+        if (photos == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(photos);
+        }
+        dest.writeString(canonicalUrl);
+        dest.writeString(description);
+        dest.writeString(shortUrl);
+        dest.writeString(timeZone);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Venue> CREATOR = new Parcelable.Creator<Venue>() {
+        @Override
+        public Venue createFromParcel(Parcel in) {
+            return new Venue(in);
+        }
+
+        @Override
+        public Venue[] newArray(int size) {
+            return new Venue[size];
+        }
+    };
 }

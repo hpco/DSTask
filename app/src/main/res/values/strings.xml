@@ -2,4 +2,12 @@
     <string name="app_name">DicksSportingTask</string>
     <string name="action_settings">Settings</string>
     <string name="ds_api">dsglabs/mobile/api</string>
+    <string name="name">DickSSporting</string>
+    <string name="city">Pitsburg</string>
+    <string name="pincode">15120</string>
+    <string name="rating">10</string>
+    <string name="placeholdertextrating">Store Rating : </string>
+    <string name="placeholdertextcity">City : </string>
+    <string name="placeholdetextzipcode">Zipcode </string>
+    <string name="placeholdetextstoreid">storeID</string>
 </resources>

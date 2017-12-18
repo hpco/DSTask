@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -19,13 +20,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hpco.harishpolusani.dickssportingTask.DsHomePage.CommonUtils;
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel.DsVenues;
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel.Location;
 import com.hpco.harishpolusani.dickssportingTask.DsHomePage.DSNearestLocationModel.Venue;
@@ -46,12 +46,14 @@ import java.util.TreeSet;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.hpco.harishpolusani.dickssportingTask.DsHomePage.CommonUtils.mlist;
+
 public class DSLocationsActivity extends AppCompatActivity implements DsLocationsContract.LocationView,OnItemClickListner, LocationListener {
 
     private DsLocationsContract.LocationPresenter mPresenter;
     @BindView(R.id.nearby_rview)
     RecyclerView recyclerView;
-@BindView(R.id.container_layout)
+    @BindView(R.id.container_layout)
     ConstraintLayout constraintLayoutcontainer;
     @BindView(R.id.api_loading)
     ProgressBar mProgressBar;
@@ -65,71 +67,57 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     private  SharedPreferences mPrefs;
     private static  final String FAV_OPTION="favoption";
     private static final String STORE_ID="storeid";
-    private List<Venue> mlist;
+
     private  FragmentTransaction ft;
     private static final String fragmentTag="DSinnerfragment";
+    private Fragment innerfragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dsnearest_locations);
-        ButterKnife.bind(this);
-        mPrefs = this.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        mPresenter = new DsLocationPresenter(this);
-        mPresenter.fetchDSApi();
-        showLoadingIndicator();
+        if(getFragmentManager().findFragmentByTag(fragmentTag)!=null){
+            if(recyclerView!=null){
+                recyclerView.setVisibility(View.GONE);
+            }
+            innerfragment=getFragmentManager().findFragmentByTag(fragmentTag);
+            getFragmentManager().beginTransaction().add(R.id.container_layout, innerfragment,fragmentTag).commit();
+        }else {
 
-    }
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_dsnearest_locations);
+            ButterKnife.bind(this);
+            mPrefs = this.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            if (CommonUtils.mlist == null){
+                mPresenter = new DsLocationPresenter(this);
+            mPresenter.fetchDSApi();
+                showLoadingIndicator();
+        }else{
+                updateAdapter(sortTheStoresByDistance(CommonUtils.mlist));
+            }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_dsnearest_locations, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
 
     @Override
     public void dsApiSuccess(DsVenues dsVenues) {
         hideLoadingIndicator();
+        if(dsVenues!=null)
+        CommonUtils.mlist=dsVenues.getVenues();
+        if(CommonUtils.mlist!=null){
+            updateAdapter(sortTheStoresByDistance(CommonUtils.mlist));
+        }
 //        updateAdapter(dsVenues);
         Log.d("Api succesful", "" + dsVenues);
         Toast.makeText(this, "success" + dsVenues, Toast.LENGTH_LONG).show();
     }
 
-//    private void updateAdapter(DsVenues dsVenues) {
-//        if (dsAdapter == null) {
-//            dsAdapter = new DsStoresAdapter(this, dsVenues.getVenues(), this);
-//            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-//            recyclerView.setLayoutManager(mLayoutManager);
-//            LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, R.anim.recycleranimation_down2up);
-//            recyclerView.setLayoutAnimation(animation);
-//            recyclerView.setAdapter(dsAdapter);
-//        } else {
-//            dsAdapter.updateData(dsVenues.getVenues());
-//            LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, R.anim.recycleranimation_down2up);
-//            recyclerView.setLayoutAnimation(animation);
-//            dsAdapter.notifyDataSetChanged();
-//            recyclerView.scheduleLayoutAnimation();
-//        }
-//    }
 
     @Override
     public void dsApiFailure() {
@@ -163,13 +151,16 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
             Venue venue;
             for (int i = 0; i < list.size(); i++) {
                 venue = list.get(i);
-                locationEnd.setLatitude(venue.getLocation().getLatitude());
-                locationEnd.setLatitude(venue.getLocation().getLongitude());
-                if(storeID!=null&&venue.getStoreId().equals(storeID)){
+                if (venue.getLocation() != null) {
+                    locationEnd.setLatitude(venue.getLocation().getLatitude());
+                    locationEnd.setLatitude(venue.getLocation().getLongitude());
 
-                    distanceMap.put(venue,0.0f);
-                }else {
-                    distanceMap.put(venue, location.distanceTo(locationEnd));
+                    if (storeID != null && venue.getStoreId().equals(storeID)) {
+
+                        distanceMap.put(venue, 0.0f);
+                    } else {
+                        distanceMap.put(venue, location.distanceTo(locationEnd));
+                    }
                 }
             }
             sortedset.addAll(distanceMap.entrySet());
@@ -233,7 +224,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-                         location = getCurrentLocation();
+                        updateAdapter(sortTheStoresByDistance(mlist));
                     }
 
 
@@ -289,6 +280,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         location4.setCity("CoopersBurg");
         location4.setLatitude(40.511488);
         location4.setLongitude(-75.390458);
+
         venue4.setLocation(location4);
         list.add(venue4);
         mlist=list;
@@ -303,6 +295,10 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
             LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, R.anim.recycleranimation_down2up);
             recyclerView.setLayoutAnimation(animation);
             recyclerView.setAdapter(dsAdapter);
+        }else{
+            recyclerView.setAdapter(dsAdapter);
+            dsAdapter.updateData(dsVenues);
+            dsAdapter.notifyDataSetChanged();
         }
     }
     @Override
@@ -325,9 +321,12 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void onclick(View view, int position,Venue venue) {
         recyclerView.setVisibility(View.GONE);
-        Fragment newFragment = new DsLocationInnerFragment(venue);
+         innerfragment = new DsLocationInnerFragment();
+        Bundle bundle=  new Bundle();
+        bundle.putParcelable("Venue",venue);
+        innerfragment.setArguments(bundle);
         ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.container_layout, newFragment,fragmentTag);
+        ft.add(R.id.container_layout, innerfragment,fragmentTag);
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -335,7 +334,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void refreshData(String id){
         mPrefs.edit().putString(STORE_ID,id).apply();
-        dsAdapter.updateData(sortTheStoresByDistance(mlist));
+        dsAdapter.updateData(sortTheStoresByDistance(CommonUtils.mlist));
         dsAdapter.notifyDataSetChanged();
 //        dsAdapter.notifyItemMoved(calculateToandFromPosition(id),0);
     }
@@ -364,8 +363,20 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
 
     @Override
     public void onBackPressed() {
-        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
-        recyclerView.setVisibility(View.VISIBLE);
+        if(getFragmentManager().findFragmentByTag(fragmentTag)!=null&&getFragmentManager().findFragmentByTag(fragmentTag).isVisible()) {
+            getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
+            recyclerView.setVisibility(View.VISIBLE);
+        }else{
+            super.onBackPressed();
+        }
 
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (getFragmentManager().findFragmentByTag(fragmentTag) != null ) {
+            getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
+        }
     }
 }
