@@ -50,12 +50,10 @@ private Context context;
      if(mVenuesList.get(position)!=null&&mVenuesList.get(position).getKey()!=null){
      holder.mName.setText(mVenuesList.get(position).getKey().getName());
          holder.mRating.setText("Store Rating : " +String.valueOf(mVenuesList.get(position).getKey().getRating()));
-         holder.mStoreId.setText("Store ID :"+mVenuesList.get(position).getKey().getStoreId());
+         holder.setStoreId(mVenuesList.get(position).getKey().getStoreId());
          if(mVenuesList.get(position).getKey().getLocation()!=null) {
              holder.mCity.setText("City : "+mVenuesList.get(position).getKey().getLocation().getCity());
              holder.mZipcode.setText("Zipcode "+mVenuesList.get(position).getKey().getLocation().getPostalCode());
-             holder.mDistance.setText("Distance From Current Location: "+String.valueOf(mVenuesList.get(position).getValue()));
-
          }
      }
     }

@@ -59,7 +59,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     private  SharedPreferences mPrefs;
     private static  final String FAV_OPTION="favoption";
     private static final String STORE_ID="storeid";
-    private List<Venue> mlist;
+    private List<Map.Entry<Venue,Float>> mlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +126,8 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void dsApiFailure() {
         hideLoadingIndicator();
-        updateAdapter(sortTheStoresByDistance(loadDummyData()));
+        mlist=sortTheStoresByDistance(loadDummyData());
+        updateAdapter(mlist);
         Log.d("Api failure", "");
     }
 
@@ -157,7 +158,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
                 venue = list.get(i);
                 locationEnd.setLatitude(venue.getLocation().getLatitude());
                 locationEnd.setLatitude(venue.getLocation().getLongitude());
-                if(storeID!=null&&venue.getStoreId().equalsIgnoreCase(storeID)){
+                if(storeID!=null&&venue.getStoreId().equals(storeID)){
                     distanceMap.put(venue,0.0f);
                 }else {
                     distanceMap.put(venue, location.distanceTo(locationEnd));
@@ -273,35 +274,17 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         location1.setLatitude(39.952584);
         location1.setLongitude(-75.165222);
         venue1.setLocation(location1);
-
         list.add(venue1);
         Venue venue2=new Venue();
         venue2.setRating(10.00);
         venue2.setStoreId("4");
         venue2.setName("Dicks Store3");
-
         Location location2= new Location();
         location2.setCity("Allentown");
         location2.setLatitude(40.608430);
         location2.setLongitude(-75.490183);
         venue2.setLocation(location2);
-//        venue2.getLocation().setCity("Allentown");
-//        venue2.getLocation().setLatitude(40.608430);
-//        venue2.getLocation().setLongitude(-75.490183);
         list.add(venue2);
-        Venue venue3=new Venue();
-        venue3.setRating(10.00);
-        venue3.setName("Dicks Store4");
-        venue3.setStoreId("2");
-        Location location3= new Location();
-        location3.setCity("Allentown");
-        location3.setLatitude(40.608430);
-        location3.setLongitude(-75.490183);
-        venue3.setLocation(location3);
-//        venue3.getLocation().setCity("Allentown");
-//        venue3.getLocation().setLatitude(40.608430);
-//        venue3.getLocation().setLongitude(-75.490183);
-        list.add(venue3);
         Venue venue4=new Venue();
         venue4.setRating(10.00);
         venue4.setName("Dicks Store5");
@@ -311,11 +294,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         location4.setLatitude(40.511488);
         location4.setLongitude(-75.390458);
         venue4.setLocation(location4);
-//        venue4.getLocation().setCity("CoopersBurg");
-//        venue4.getLocation().setLatitude(40.511488);
-//        venue4.getLocation().setLongitude(-75.390458);
         list.add(venue4);
-        mlist=list;
         return list;
     }
 
@@ -354,8 +333,18 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void refreshData(String id){
         mPrefs.edit().putString(STORE_ID,id).apply();
-        dsAdapter.updateData(sortTheStoresByDistance(mlist));
-        dsAdapter.notifyDataSetChanged();
+        dsAdapter.notifyItemMoved(calculateToandFromPosition(id),0);
+    }
+
+    private int calculateToandFromPosition(String id) {
+        if(mlist!=null) {
+            for (int i = 0; i < mlist.size(); i++) {
+                if (id.equalsIgnoreCase(mlist.get(i).getKey().getStoreId())) {
+                    return i;
+                }
+            }
+        }
+        return 0;
     }
 
     @Override

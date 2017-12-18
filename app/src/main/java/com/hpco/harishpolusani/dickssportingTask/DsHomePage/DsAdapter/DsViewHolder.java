@@ -31,14 +31,14 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
     @BindView(R.id.rating)
     TextView mRating;
 
-    @BindView(R.id.distance)
-    TextView mDistance;
     @BindView(R.id.fav_view)
     ImageView favView;
 
-    @BindView(R.id.storeid)
-    TextView mStoreId;
 
+
+
+
+    private String storeId;
     private DsStoresAdapter.OnItemClickListner listner;
 
     public DsViewHolder(View itemView, DsStoresAdapter.OnItemClickListner listner) {
@@ -50,13 +50,15 @@ public class DsViewHolder extends RecyclerView.ViewHolder implements View.OnClic
        favView.setOnClickListener(this);
     }
 
-
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
     @Override
     public void onClick(View view) {
         if(view.getId()==favView.getId()){
 //            int pos = getAdapterPosition();
 //            if (pos != RecyclerView.NO_POSITION) {
-                listner.refreshData(mStoreId.getText().toString());
+                listner.refreshData(storeId);
 //            }
         }else {
             int pos = getAdapterPosition();
