@@ -1,5 +1,6 @@
 # DSTask
 ** forgot to add the description for the fav_icon > tap the fav_icon to set the store as favourite.
+The Toccuh area for the icon can be improved further.
 1)I choose to Implement MVP patteren for the given requirement .which is good for TDD. 
 2) Used Rx java in fetching the api .rx handles the threads efficiently. 
 3) used some of the libraries  Glide, ButterKnife , retrofit which optimizes the app further.
