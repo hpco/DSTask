@@ -74,20 +74,24 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_dsnearest_locations);
-            ButterKnife.bind(this);
-            mPrefs = this.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            if (CommonUtils.mlist == null){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dsnearest_locations);
+        ButterKnife.bind(this);
+        mPrefs = this.getSharedPreferences(FAV_OPTION, Activity.MODE_PRIVATE);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if((CommonUtils.isFragment) && getFragmentManager().findFragmentByTag(fragmentTag)!=null) {
+            getFragmentManager().beginTransaction().add(R.id.container_layout ,getFragmentManager().findFragmentByTag(fragmentTag)).commit();
+            recyclerView.setVisibility(View.GONE);
+        }else {
+            if (CommonUtils.mlist == null) {
                 mPresenter = new DsLocationPresenter(this);
-            mPresenter.fetchDSApi();
+                mPresenter.fetchDSApi();
                 showLoadingIndicator();
-        }else{
+            } else {
                 updateAdapter(sortTheStoresByDistance(CommonUtils.mlist));
             }
+        }
     }
 
     @Override
@@ -297,7 +301,6 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         super.onDestroy();
         if(mPresenter!=null){
             mPresenter.unSubscribe();
-            CommonUtils.mlist=null;
             dsAdapter=null;
             recyclerView=null;
             locationManager=null;
@@ -362,6 +365,8 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         if(getFragmentManager().findFragmentByTag(fragmentTag)!=null&&getFragmentManager().findFragmentByTag(fragmentTag).isVisible()) {
             getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
             recyclerView.setVisibility(View.VISIBLE);
+            CommonUtils.isFragment=false;
+            updateAdapter(sortTheStoresByDistance(CommonUtils.mlist));
         }else{
             super.onBackPressed();
         }
@@ -371,7 +376,8 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (getFragmentManager().findFragmentByTag(fragmentTag) != null ) {
+        if (getFragmentManager().findFragmentByTag(fragmentTag) != null&&getFragmentManager().findFragmentByTag(fragmentTag).isVisible() ) {
+            CommonUtils.isFragment=true;
             getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag(fragmentTag)).commit();
         }
     }
