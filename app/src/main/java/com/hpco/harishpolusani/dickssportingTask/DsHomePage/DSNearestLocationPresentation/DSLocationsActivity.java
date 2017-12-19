@@ -74,14 +74,7 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(getFragmentManager().findFragmentByTag(fragmentTag)!=null){
-            if(recyclerView!=null){
-                recyclerView.setVisibility(View.GONE);
-            }
-            innerfragment=getFragmentManager().findFragmentByTag(fragmentTag);
-            getFragmentManager().beginTransaction().add(R.id.container_layout, innerfragment,fragmentTag).commit();
-        }else {
-
+    
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_dsnearest_locations);
             ButterKnife.bind(this);
@@ -95,8 +88,6 @@ public class DSLocationsActivity extends AppCompatActivity implements DsLocation
         }else{
                 updateAdapter(sortTheStoresByDistance(CommonUtils.mlist));
             }
-
-        }
     }
 
     @Override
