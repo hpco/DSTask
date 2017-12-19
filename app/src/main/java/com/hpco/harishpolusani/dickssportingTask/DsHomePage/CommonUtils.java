@@ -10,4 +10,5 @@ import java.util.List;
 
 public class CommonUtils {
     public static  List<Venue> mlist;
+    public static Boolean isFragment=false;
 }
